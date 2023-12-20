@@ -79,6 +79,47 @@ def handle_hello():
 
     return jsonify(members), 200
 
+
+@app.route('/member', methods=['POST'])
+def add_member():
+    try:
+        data = request.get_json()
+        required_fields = ['first_name', 'age', 'lucky_numbers', 'id']
+
+        if not all(field in data for field in required_fields):
+            return jsonify({'msg': 'Missing required fields'}), 400
+
+        new_member = {
+            'first_name': data['first_name'],
+            'id': data['id'],
+            'age': data['age'],
+            'lucky_numbers': data['lucky_numbers'],
+        }
+
+        new_member_x = jackson_family.add_member(member= new_member)
+        return jsonify(new_member), 200
+
+    except Exception as e:
+        return jsonify({'msg': 'An error occurred: ' + str(e)}), 500
+    
+
+
+
+@app.route('/member/<int:id>', methods=['GET'])
+def get_member(id):
+    single_obj = jackson_family.get_member(id)
+    return jsonify(single_obj), 200
+
+
+
+@app.route('/member/<int:id>', methods=['DELETE'])
+def delete_member(id):
+    single_obj = jackson_family.delete_member(id)
+
+    return jsonify({'done': True}), 200
+
+
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
